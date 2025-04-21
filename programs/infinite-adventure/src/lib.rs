@@ -6,7 +6,7 @@ pub mod instructions; // Declare the instructions module
 pub mod error;        // Declare the error module
 pub mod constants;    // Declare the constants module
 
-declare_id!("FRn36REFFTYniAqyE3CPeTTu8NxTgcZBXhXUztJzWqsX");
+declare_id!("33BuEyGHLbL7up1w6NK8NHRTxYiQmcRANCKp5tfKuv1m");
 
 #[program]
 pub mod infinite_adventure {

@@ -21,6 +21,4 @@ test-sbf = []
 anchor-lang = "0.31.1"
 
 [dev-dependencies]
-mollusk-svm = "=0.0.15"
 solana-program = "~2.1"
-

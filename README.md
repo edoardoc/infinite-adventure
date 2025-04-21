@@ -1,20 +1,35 @@
-# infinite-adventure
-An infinite Solana adventure
+# An infinite Solana adventure
 
-every step / location is a room, a description get shown (text adventure)
+This is a simple, endless exploration and collection game.
+It uses a Dictionary of Locations approach for random gameplay generation, implementing a "discovery" mechanism:
 
-the map of the game could be stored as a variable length array, or a flat simple rectangular X,Y array where elements get disseminated inside
-like naval battle
-what elements:
-Rock, Tree, Lake, Mushroom, etc
+<i>When the player moves to a new, unexplored exit from their current location, a new location is generated on the fly</i>
 
-It would be nicer if the game map would be stored to create paths, so that some directions are inhibited:
+When a new location needs to be created, decides on:
+  - A description: simple and evocative (e.g., "a patch of mossy ground," "a cluster of rocks," "a small stream"), it works on a list of descriptive phrases and randomly combines them.
+  - Possible exits: Randomly decides which directions will lead to new, unexplored areas.
+  Ensures that if an exit from location A to a new location B is created, then location B will eventually (when explored) have an exit back towards A or another part of the existing map.
+  (It keeps track of the "parent" location that led to the creation of the new one)
+  - Collection items: Randomly determines if any items (mushrooms!) are present in the new location and what type/quantity.
 
-You cannot go right, there is a wall
-you cannot proceed, there is a river
-There is a lake in front of you
-etc.
 
-the gamemap should be randomly generated, and it would be infinite
+## Build etc.
+`anchor build --arch sbf`
 
-purpose of the game?
+## Flow
+
+
+## Features
+- Endless game
+- Probability
+- Map
+
+## Todo
+- Pregenerated map
+- Collect method is expensive, a failed collect grows mushrooms randomly in the map
+- Three types of mushroom
+- Integrate mollusk testing
+
+## Open questions
+- How multiple users are handled?
+- "Social" aspect of mushroom hunting, together in a solana crowd :)

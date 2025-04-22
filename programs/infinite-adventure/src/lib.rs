@@ -1,8 +1,10 @@
 use crate::constants::constants::*;
+use crate::error::AdventureError;
+use crate::state::Exit;
 use crate::state::Location;
 use anchor_lang::prelude::*;
 use instructions::*; // Import all instructions
-use std::collections::HashMap;
+use oorandom::Rand32; // Import Rand32 for random number generation
 
 pub mod constants;
 pub mod error; // Declare the error module
@@ -17,54 +19,100 @@ pub mod infinite_adventure {
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
         let new_game_data_account = &mut ctx.accounts.new_game_data_account;
-        new_game_data_account.player_location = START_LOCATION_ID.to_string();
+        new_game_data_account.player_location_index = START_LOCATION_INDEX;
         new_game_data_account.player_inventory = Vec::new();
 
         let new_game_map_account = &mut ctx.accounts.new_game_map_account;
-        let exits = vec![
-            ("north".to_string(), Some("forest".to_string())),
-            ("south".to_string(), Some("cave".to_string())),
-            ("east".to_string(), None),
-            ("west".to_string(), None),
-        ];
-        let loc = Location {
-            description: "You are in a dense forest.".to_string(),
+        new_game_map_account.locations = Vec::new();
+        new_game_map_account.locations.push(Location {
+            description: "You find yourself in a peaceful meadow.".to_string(),
             exits: vec![
-                ("south".to_string(), Some(START_LOCATION_ID.to_string())),
-                ("east".to_string(), None),
-                ("west".to_string(), None),
+                Exit {
+                    direction: "north".to_string(),
+                    target_index: None,
+                },
+                Exit {
+                    direction: "east".to_string(),
+                    target_index: None,
+                },
             ],
-            items: vec!["rare flower".to_string()],
-            visited: false,
-        };
+            items: vec!["common mushroom".to_string()],
+            visited: true,
+        });
 
-        // new_game_map_account
-        //     .locations
-        //     .insert(START_LOCATION_ID.to_string(), loc);
-
-        msg!("A Journey Begins!");
+        msg!("Game initialized.");
         Ok(())
     }
 
-    // pub fn move_west(ctx: Context<MoveWest>) -> Result<()> {
-    //     let game_data_account = &mut ctx.accounts.game_data_account;
-    //     if game_data_account.player_position == 0 {
-    //         msg!("You are back at the start.");
-    //     } else {
-    //         game_data_account.player_position -= 1;
-    //         print_player(game_data_account.player_position);
-    //     }
-    //     Ok(())
-    // }
+    pub fn move_player(ctx: Context<MovePlayer>, direction: String) -> Result<()> {
+        let game_data_account = &mut ctx.accounts.game_data_account;
+        let game_map_account = &mut ctx.accounts.game_map_account;
+        let current_location_index = game_data_account.player_location_index;
 
-    // pub fn move_east(ctx: Context<MoveEast>) -> Result<()> {
-    //     let game_data_account = &mut ctx.accounts.game_data_account;
-    //     if game_data_account.player_position == 3 {
-    //         msg!("You have reached the end! Super!");
-    //     } else {
-    //         game_data_account.player_position = game_data_account.player_position + 1;
-    //         print_player(game_data_account.player_position);
-    //     }
-    //     Ok(())
-    // }
+        if let Some(current_location) = game_map_account.locations.get_mut(current_location_index as usize) {
+            if let Some(exit) = current_location.exits.iter().find(|e| e.direction == direction) {
+                if let Some(next_location_index) = exit.target_index {
+                    game_data_account.player_location_index = next_location_index;
+                } else {
+                    let new_location_index = game_map_account.locations.len();
+                    let opposite_direction = match direction.as_str() {
+                        "north" => "south",
+                        "south" => "north",
+                        "east" => "west",
+                        "west" => "east",
+                        _ => "",
+                    };
+
+                    let possible_new_directions = ["north", "south", "east", "west"]
+                        .iter()
+                        .filter(|&d| *d != direction && *d != opposite_direction)
+                        .map(|d| d.to_string())
+                        .collect::<Vec<String>>();
+
+                    let mut rng = Rand32::new(Clock::get().unwrap().unix_timestamp as u64); // Seed with current timestamp
+                    let num_new_exits = (rng.rand_u32() % (std::cmp::min(3, possible_new_directions.len() as u32) + 1)) as usize;
+                    let shuffled_directions = {
+                        let mut temp = possible_new_directions;
+                        // Need to implement a Fisher-Yates shuffle for Vec with oorandom
+                        for i in (1..temp.len()).rev() {
+                            let j = (rng.rand_u32() % (i + 1) as u32) as usize;
+                            temp.swap(i, j);
+                        }
+                        temp
+                    };
+
+                    let mut exits = Vec::new();
+                    for i in 0..num_new_exits {
+                        exits.push(Exit {
+                            direction: shuffled_directions[i].to_string(),
+                            target_index: None,
+                        });
+                    }
+
+                    let descriptions = ["A dense patch of ferns.", "A rocky outcrop with a view.", "A quiet clearing.", "A whispering forest path."];
+                    let description = descriptions[(rng.rand_u32() % descriptions.len() as u32) as usize].to_string();
+                    let num_items = (rng.rand_u32() % 2) as usize;
+                    let mut items = Vec::new();
+                    for _ in 0..num_items {
+                        let mushroom_type = ["common mushroom", "rare mushroom"][(rng.rand_u32() % 2) as usize].to_string();
+                        items.push(mushroom_type);
+                    }
+
+                    game_map_account.locations.push(Location {
+                        description,
+                        exits,
+                        items,
+                        visited: true,
+                    });
+
+                    game_data_account.player_location_index = new_location_index as u32;
+                }
+            } else {
+                return err!(AdventureError::InvalidMove);
+            }
+        } else {
+            return err!(AdventureError::InvalidLocationIndex);
+        }
+        Ok(())
+    }
 }

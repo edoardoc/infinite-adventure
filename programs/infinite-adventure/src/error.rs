@@ -6,6 +6,6 @@ pub enum AdventureError {
     InvalidMove,
     #[msg("The requested item was not found at this location.")]
     ItemNotFound,
-    #[msg("Invalid location ID.")]
-    InvalidLocation,
+    #[msg("Invalid location index.")]
+    InvalidLocationIndex,
 }

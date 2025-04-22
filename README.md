@@ -33,3 +33,7 @@ When a new location needs to be created, decides on:
 ## Open questions
 - How multiple users are handled?
 - "Social" aspect of mushroom hunting, together in a solana crowd :)
+
+## references
+-  Fisher-Yates shuffle
+   https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle

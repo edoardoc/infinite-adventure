@@ -57,24 +57,35 @@ pub struct ViewLocation<'info> {
     pub authority: Signer<'info>, // Player's wallet
 }
 
-#[derive(Accounts)]
-pub struct MoveWest<'info> {
-    #[account(mut)]
-    pub game_data_account: Account<'info, GameDataAccount>,
-}
+pub fn print_player_status(game_data_account: &Account<GameDataAccount>, game_map_account: &Account<GameMapAccount>) -> Result<()> {
+  let current_location_index = game_data_account.player_location_index;
+  let player_inventory = &game_data_account.player_inventory;
 
-#[derive(Accounts)]
-pub struct MoveEast<'info> {
-    #[account(mut)]
-    pub game_data_account: Account<'info, GameDataAccount>,
-}
+  if let Some(location) = game_map_account.locations.get(current_location_index as usize) {
+      msg!("------------------------------------");
+      msg!("You are currently at:");
+      msg!("{}", location.description);
+      msg!("------------------------------------");
 
-pub fn print_player(player_position: u8) {
-    match player_position {
-        0 => msg!("o......."),
-        1 => msg!("..o....."),
-        2 => msg!("....o..."),
-        3 => msg!("......o."),
-        _ => msg!("Invalid position!"),
-    }
+      if !player_inventory.is_empty() {
+          msg!("Your inventory contains:");
+          for item in player_inventory {
+              msg!("- {}", item);
+          }
+          msg!("------------------------------------");
+      } else {
+          msg!("Your inventory is empty.");
+          msg!("------------------------------------");
+      }
+
+      msg!("Available exits:");
+      for exit in &location.exits {
+          msg!("- {}", exit.direction);
+      }
+      msg!("------------------------------------");
+  } else {
+      msg!("Error: Player location index is invalid!");
+  }
+
+  Ok(())
 }

@@ -4,13 +4,13 @@ use crate::state::Exit;
 use crate::state::GameMapAccount;
 use crate::state::Location;
 use anchor_lang::prelude::*;
-use instructions::*; // Import all instructions
-use oorandom::Rand32; // Import Rand32 for random number generation
+use instructions::*;
+use oorandom::Rand32;
 
 pub mod constants;
-pub mod error; // Declare the error module
-pub mod instructions; // Declare the instructions module
-pub mod state; // Declare the state module // Declare the constants module
+pub mod error;
+pub mod instructions;
+pub mod state;
 
 declare_id!("33BuEyGHLbL7up1w6NK8NHRTxYiQmcRANCKp5tfKuv1m");
 
@@ -42,6 +42,7 @@ pub mod infinite_adventure {
         });
 
         msg!("A Journey Begins!");
+        print_player_status(&ctx.accounts.new_game_data_account, &ctx.accounts.new_game_map_account)?;
         Ok(())
     }
 
@@ -70,6 +71,7 @@ pub mod infinite_adventure {
         } else {
             return err!(AdventureError::InvalidLocationIndex);
         }
+        print_player_status(&ctx.accounts.game_data_account, &ctx.accounts.game_map_account)?;
         Ok(())
     }
 
@@ -89,24 +91,33 @@ pub mod infinite_adventure {
         } else {
             return err!(AdventureError::InvalidLocationIndex);
         }
+        print_player_status(&ctx.accounts.game_data_account, &ctx.accounts.game_map_account)?;
         Ok(())
     }
 
     pub fn view_location(ctx: Context<ViewLocation>) -> Result<()> {
-      let game_data_account = &ctx.accounts.game_data_account;
-      let game_map_account = &ctx.accounts.game_map_account;
-      let current_location_index = game_data_account.player_location_index;
+        let game_data_account = &ctx.accounts.game_data_account;
+        let game_map_account = &ctx.accounts.game_map_account;
+        let current_location_index = game_data_account.player_location_index;
 
-      if let Some(location) = game_map_account.locations.get(current_location_index as usize) {
-          msg!("Description: {}", location.description);
-          msg!("Items: {}", location.items.join(", "));
-          msg!("Exits: {}", location.exits.iter().map(|e| format!("{}: {:?}", e.direction, e.target_index)).collect::<Vec<String>>().join(", "));
-      } else {
-          return err!(AdventureError::InvalidLocationIndex);
-      }
-      Ok(())
-  }
-
+        if let Some(location) = game_map_account.locations.get(current_location_index as usize) {
+            msg!("Description: {}", location.description);
+            msg!("Items: {}", location.items.join(", "));
+            msg!(
+                "Exits: {}",
+                location
+                    .exits
+                    .iter()
+                    .map(|e| format!("{}: {:?}", e.direction, e.target_index))
+                    .collect::<Vec<String>>()
+                    .join(", ")
+            );
+        } else {
+            return err!(AdventureError::InvalidLocationIndex);
+        }
+        print_player_status(&ctx.accounts.game_data_account, &ctx.accounts.game_map_account)?;
+        Ok(())
+    }
 }
 
 fn generate_new_location(

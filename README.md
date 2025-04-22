@@ -16,8 +16,49 @@ When a new location needs to be created, decides on:
 ## Build etc.
 `anchor build --arch sbf`
 
-## Flow
+## Example interaction Flow
 
+```bash
+~/ yarn dev
+yarn run v1.22.22
+$ ts-node src/index.ts
+Payer Public Key: AvGhvdjzdSmvB6CXUSHmqCAaLiaTJQ6ngdSCz8SH94gW
+Running client...
+Initializing game...
+Initialized game. Transaction: pUcscFSus6sKd25KjdBP3n7GqprYGtrjrPNZfH98J2XQRSCTZznuCTB2FDphuSW284uxZbGHs4ChdCEGty2KVJW
+
+Viewing initial location...
+Viewed location. Transaction: 5Y2NCwVGAGLxJ2xsigqA5GHiEpvGUDUMJi11rg5yo4bJ5GV1tjSMuqcS6d6t8peWjDueW39kxLExaNAahMjq4RNr
+Current Player Location Index: 0
+Game Map Locations: [
+  {
+    description: 'You find yourself in a peaceful meadow.',
+    exits: [ [Object], [Object] ],
+    items: [ 'common mushroom' ],
+    visited: true
+  }
+]
+
+Attempting to move north...
+Moved north. Transaction: 66girUoyQnCTjDZHrUWr74q9BzPE4QNqNhrv47bob7XD69oLsvVDgq1HGsSdnhgJ6c68TdwQ1BywDTqdycxT4JZf
+New Player Location Index: 1
+Viewed new location. Transaction: 2rhvLvsLHyTFHLr1nSRWC1AADavJBn862JqMh3Qnpx92HDJYvfi27Nw5DwGS1AVSPptGUay3jNCBLV28USARJjxg
+Updated Game Map Locations: [
+  {
+    description: 'You find yourself in a peaceful meadow.',
+    exits: [ [Object], [Object] ],
+    items: [ 'common mushroom' ],
+    visited: true
+  },
+  {
+    description: 'A whispering forest path.',
+    exits: [ [Object], [Object] ],
+    items: [],
+    visited: true
+  }
+]
+✨  Done in 9.01s.
+```
 
 ## Features
 - Endless game

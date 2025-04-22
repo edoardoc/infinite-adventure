@@ -12,7 +12,7 @@ pub mod error;
 pub mod instructions;
 pub mod state;
 
-declare_id!("33BuEyGHLbL7up1w6NK8NHRTxYiQmcRANCKp5tfKuv1m");
+declare_id!("7gMbksSMJbpH45gVH3QDxTUa2w4oSv6rfdjifPM8LUwX");
 
 #[program]
 pub mod infinite_adventure {

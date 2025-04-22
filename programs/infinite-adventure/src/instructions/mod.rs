@@ -16,17 +16,15 @@ pub struct Initialize<'info> {
      )]
     pub new_game_data_account: Account<'info, GameDataAccount>,
     #[account(mut)]
-
     pub signer: Signer<'info>,
     pub system_program: Program<'info, System>,
-
     #[account(
-        init,
-        seeds = [GAME_MAP_ACCOUNT_SEED],
-        bump,
-        payer = signer,
-        space = 8 + std::mem::size_of::<GameMapAccount>() + (4 + 2048), // Adjust space for Vec
-      )]
+         init,
+         payer = signer,
+         space = 8 + std::mem::size_of::<GameMapAccount>() + (4 + 2048), // Adjust space for Vec
+         seeds = [GAME_MAP_ACCOUNT_SEED],
+         bump,
+     )]
     pub new_game_map_account: Account<'info, GameMapAccount>,
 }
 

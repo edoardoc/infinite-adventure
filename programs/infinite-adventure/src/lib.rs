@@ -55,8 +55,12 @@ pub mod infinite_adventure {
                 if let Some(next_location_index) = exit.target_index {
                     game_data_account.player_location_index = next_location_index;
                 } else {
-                    let (new_location_index, new_location) = generate_new_location(&direction, game_map_account);
-                    game_map_account.locations.push(new_location);
+                    let new_location_index = generate_new_location(current_location_index, &direction, game_map_account);
+                    if let Some(current_loc_mut) = game_map_account.locations.get_mut(current_location_index as usize) {
+                        if let Some(exit_mut) = current_loc_mut.exits.iter_mut().find(|e| e.direction == direction) {
+                            exit_mut.target_index = Some(new_location_index as u32);  // Sets the target index of the exit
+                        }
+                    }
                     game_data_account.player_location_index = new_location_index as u32;
                 }
             } else {
@@ -69,9 +73,14 @@ pub mod infinite_adventure {
     }
 }
 
-fn generate_new_location(direction: &str, game_map_account: &mut GameMapAccount) -> (usize, Location) {
-    let new_location_index: usize = game_map_account.locations.len();
-    let opposite_direction = match direction {
+
+fn generate_new_location(
+    previous_location_index: u32,
+    direction_from_previous: &str,
+    game_map_account: &mut Account<GameMapAccount>,
+) -> u32 {
+    let new_location_index = game_map_account.locations.len() as u32;
+    let opposite_direction = match direction_from_previous {
         "north" => "south",
         "south" => "north",
         "east" => "west",
@@ -79,9 +88,15 @@ fn generate_new_location(direction: &str, game_map_account: &mut GameMapAccount)
         _ => "",
     };
 
+    let mut exits = Vec::new();
+    exits.push(Exit {
+        direction: opposite_direction.to_string(),
+        target_index: Some(previous_location_index),
+    });
+
     let possible_new_directions = ["north", "south", "east", "west"]
         .iter()
-        .filter(|&d| *d != direction && *d != opposite_direction)
+        .filter(|&d| *d != direction_from_previous && *d != opposite_direction)
         .map(|d| d.to_string())
         .collect::<Vec<String>>();
 
@@ -119,12 +134,12 @@ fn generate_new_location(direction: &str, game_map_account: &mut GameMapAccount)
         items.push(mushroom_type);
     }
 
-    let new_location = Location {
+    game_map_account.locations.push(Location {
         description,
         exits,
         items,
         visited: true,
-    };
+    });
 
-    (new_location_index, new_location)
+    new_location_index
 }

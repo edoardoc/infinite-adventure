@@ -41,19 +41,19 @@ pub struct MovePlayer<'info> {
 
 #[derive(Accounts)]
 pub struct CollectItem<'info> {
-    #[account(mut, seeds = [b"level1"], bump)]
+    #[account(mut, seeds = [GAME_LEVEL_SEED], bump)]
     pub game_data_account: Account<'info, GameDataAccount>,
-    #[account(mut)]
-    pub game_map: Account<'info, GameMapAccount>,
+    #[account(mut, seeds = [GAME_MAP_ACCOUNT_SEED], bump)]
+    pub game_map_account: Account<'info, GameMapAccount>,
     pub authority: Signer<'info>, // Player's wallet
 }
 
 #[derive(Accounts)]
 pub struct ViewLocation<'info> {
-    #[account(seeds = [b"level1"], bump)]
+    #[account(seeds = [GAME_LEVEL_SEED], bump)]
     pub game_data_account: Account<'info, GameDataAccount>,
-    #[account()]
-    pub game_map: Account<'info, GameMapAccount>,
+    #[account(seeds = [GAME_MAP_ACCOUNT_SEED], bump)]
+    pub game_map_account: Account<'info, GameMapAccount>,
     pub authority: Signer<'info>, // Player's wallet
 }
 

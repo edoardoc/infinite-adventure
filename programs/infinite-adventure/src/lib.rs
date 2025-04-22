@@ -58,7 +58,8 @@ pub mod infinite_adventure {
                     let new_location_index = generate_new_location(current_location_index, &direction, game_map_account);
                     if let Some(current_loc_mut) = game_map_account.locations.get_mut(current_location_index as usize) {
                         if let Some(exit_mut) = current_loc_mut.exits.iter_mut().find(|e| e.direction == direction) {
-                            exit_mut.target_index = Some(new_location_index as u32);  // Sets the target index of the exit
+                            exit_mut.target_index = Some(new_location_index as u32);
+                            // Sets the target index of the exit
                         }
                     }
                     game_data_account.player_location_index = new_location_index as u32;
@@ -71,8 +72,42 @@ pub mod infinite_adventure {
         }
         Ok(())
     }
-}
 
+    pub fn collect_item(ctx: Context<CollectItem>, item_name: String) -> Result<()> {
+        let game_data_account = &mut ctx.accounts.game_data_account;
+        let game_map_account = &mut ctx.accounts.game_map_account;
+        let current_location_index = game_data_account.player_location_index;
+
+        if let Some(location) = game_map_account.locations.get_mut(current_location_index as usize) {
+            if let Some(index) = location.items.iter().position(|item| *item == item_name) {
+                let collected_item = location.items.remove(index);
+                game_data_account.player_inventory.push(collected_item);
+                msg!("Collected {}", item_name);
+            } else {
+                return err!(AdventureError::ItemNotFound);
+            }
+        } else {
+            return err!(AdventureError::InvalidLocationIndex);
+        }
+        Ok(())
+    }
+
+    pub fn view_location(ctx: Context<ViewLocation>) -> Result<()> {
+      let game_data_account = &ctx.accounts.game_data_account;
+      let game_map_account = &ctx.accounts.game_map_account;
+      let current_location_index = game_data_account.player_location_index;
+
+      if let Some(location) = game_map_account.locations.get(current_location_index as usize) {
+          msg!("Description: {}", location.description);
+          msg!("Items: {}", location.items.join(", "));
+          msg!("Exits: {}", location.exits.iter().map(|e| format!("{}: {:?}", e.direction, e.target_index)).collect::<Vec<String>>().join(", "));
+      } else {
+          return err!(AdventureError::InvalidLocationIndex);
+      }
+      Ok(())
+  }
+
+}
 
 fn generate_new_location(
     previous_location_index: u32,

@@ -1,6 +1,6 @@
 import * as anchor from '@coral-xyz/anchor';
 import { Program } from '@coral-xyz/anchor';
-import { InfiniteAdventure } from '../../target/types/infinite_adventure';
+import { InfiniteAdventure } from '../target/types/infinite_adventure';
 import { Keypair, PublicKey } from '@solana/web3.js';
 import { getAssociatedTokenAddressSync } from '@solana/spl-token';
 
@@ -9,10 +9,12 @@ const cluster = 'devnet';
 const connection = new anchor.web3.Connection(anchor.web3.clusterApiUrl(cluster), 'confirmed');
 
 // Load the program ID from your Anchor.toml or hardcode it.
-const programId = new PublicKey('YOUR_PROGRAM_ID_HERE'); // Replace with your program ID
+const programId = new PublicKey('7gMbksSMJbpH45gVH3QDxTUa2w4oSv6rfdjifPM8LUwX'); // Replace with your program ID
 
-// Generate a random keypair for the payer.
-const payer = Keypair.generate();
+// grab the payer from a private key
+const privateKeyArray = Uint8Array.from([14,45,131,187,62,86,48,120,156,89,228,203,188,194,249,194,251,67,75,46,181,63,161,140,136,174,194,49,85,226,174,237,147,94,185,61,134,12,250,237,71,68,63,17,50,11,71,227,247,202,16,133,41,136,37,140,61,18,121,172,123,83,62,127]);
+const payer = Keypair.fromSecretKey(privateKeyArray);
+console.log('Payer Public Key:', payer.publicKey.toBase58());
 
 async function main() {
   console.log('Running client...');
@@ -24,10 +26,7 @@ async function main() {
   anchor.setProvider(provider);
 
   // Get the program.
-  const program = anchor.workspace.InfiniteAdventure as Program<InfiniteAdventure>; // If using Anchor.toml
-
-  // Alternatively, if not using Anchor.toml workspace:
-  // const program = new Program<InfiniteAdventure>(idl as any, programId, provider);
+  const program = anchor.workspace.InfiniteAdventure as Program<InfiniteAdventure>; // Anchor.toml
 
   // Derive the PDAs for the game accounts.
   const gameLevelSeed = Buffer.from('level1');
@@ -49,11 +48,11 @@ async function main() {
     const tx = await program.methods
       .initialize()
       .accounts({
-        newGameDataAccount: gameDataAccount,
-        newGameMapAccount: gameMapAccount,
+        newGameDataAccount: gameDataAccount as PublicKey,
+        newGameMapAccount: gameMapAccount as PublicKey,
         signer: payer.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
-      })
+      } as any)
       .signers([payer])
       .rpc();
     console.log('Initialized game. Transaction:', tx);
@@ -68,17 +67,17 @@ async function main() {
     const tx = await program.methods
       .viewLocation()
       .accounts({
-        gameDataAccount: gameDataAccount,
-        gameMapAccount: gameMapAccount,
+        gameDataAccount: gameDataAccount as PublicKey,
+        gameMapAccount: gameMapAccount as PublicKey,
         authority: payer.publicKey,
-      })
+      } as any)
       .signers([payer])
       .rpc();
     console.log('Viewed location. Transaction:', tx);
 
     const gameData = await program.account.gameDataAccount.fetch(gameDataAccount);
     const gameMap = await program.account.gameMapAccount.fetch(gameMapAccount);
-    console.log('Current Player Location Index:', gameData.playerLocation);
+    console.log('Current Player Location Index:', gameData.playerLocationIndex);
     console.log('Game Map Locations:', gameMap.locations);
   } catch (error) {
     console.error('Error viewing location:', error);
@@ -91,25 +90,25 @@ async function main() {
     const tx = await program.methods
       .movePlayer(moveDirection)
       .accounts({
-        gameDataAccount: gameDataAccount,
-        gameMapAccount: gameMapAccount,
+        gameDataAccount: gameDataAccount as PublicKey,
+        gameMapAccount: gameMapAccount as PublicKey,
         authority: payer.publicKey,
-      })
+      } as any)
       .signers([payer])
       .rpc();
     console.log(`Moved ${moveDirection}. Transaction:`, tx);
 
     const gameData = await program.account.gameDataAccount.fetch(gameDataAccount);
-    console.log('New Player Location Index:', gameData.playerLocation);
+    console.log('New Player Location Index:', gameData.playerLocationIndex);
 
     // View the new location
     const txView = await program.methods
       .viewLocation()
       .accounts({
-        gameDataAccount: gameDataAccount,
-        gameMapAccount: gameMapAccount,
+        gameDataAccount: gameDataAccount as PublicKey,
+        gameMapAccount: gameMapAccount as PublicKey,
         authority: payer.publicKey,
-      })
+      } as any)
       .signers([payer])
       .rpc();
     console.log('Viewed new location. Transaction:', txView);

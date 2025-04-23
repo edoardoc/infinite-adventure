@@ -93,7 +93,7 @@ async function main() {
         const gameData = await program.account.gameDataAccount.fetch(gameDataAccount);
         const gameMap = await program.account.gameMapAccount.fetch(gameMapAccount);
         console.log('Current Player Location Index:', gameData.playerLocation);
-        console.log('Game Map Locations:', gameMap.locations);
+        console.log('Game Map:', JSON.stringify(gameMap.locations, null, 2));
     }
     catch (error) {
         console.error('Error viewing location:', error);
@@ -126,7 +126,7 @@ async function main() {
             .rpc();
         console.log('Viewed new location. Transaction:', txView);
         const newGameMap = await program.account.gameMapAccount.fetch(gameMapAccount);
-        console.log('Updated Game Map Locations:', newGameMap.locations);
+        console.log('Game Map:', JSON.stringify(newGameMap.locations, null, 2));
     }
     catch (error) {
         console.error(`Error moving ${moveDirection}:`, error);

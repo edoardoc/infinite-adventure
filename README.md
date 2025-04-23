@@ -24,40 +24,202 @@ yarn run v1.22.22
 $ ts-node src/index.ts
 Payer Public Key: AvGhvdjzdSmvB6CXUSHmqCAaLiaTJQ6ngdSCz8SH94gW
 Running client...
-Initializing game...
-Initialized game. Transaction: pUcscFSus6sKd25KjdBP3n7GqprYGtrjrPNZfH98J2XQRSCTZznuCTB2FDphuSW284uxZbGHs4ChdCEGty2KVJW
-
-Viewing initial location...
-Viewed location. Transaction: 5Y2NCwVGAGLxJ2xsigqA5GHiEpvGUDUMJi11rg5yo4bJ5GV1tjSMuqcS6d6t8peWjDueW39kxLExaNAahMjq4RNr
-Current Player Location Index: 0
-Game Map Locations: [
+Accounts already initialized.
+Current Player Location Index: 1
+Game Map: [
   {
-    description: 'You find yourself in a peaceful meadow.',
-    exits: [ [Object], [Object] ],
-    items: [ 'common mushroom' ],
-    visited: true
-  }
-]
-
-Attempting to move north...
-Moved north. Transaction: 66girUoyQnCTjDZHrUWr74q9BzPE4QNqNhrv47bob7XD69oLsvVDgq1HGsSdnhgJ6c68TdwQ1BywDTqdycxT4JZf
-New Player Location Index: 1
-Viewed new location. Transaction: 2rhvLvsLHyTFHLr1nSRWC1AADavJBn862JqMh3Qnpx92HDJYvfi27Nw5DwGS1AVSPptGUay3jNCBLV28USARJjxg
-Updated Game Map Locations: [
-  {
-    description: 'You find yourself in a peaceful meadow.',
-    exits: [ [Object], [Object] ],
-    items: [ 'common mushroom' ],
-    visited: true
+    "description": "You find yourself in a peaceful meadow.",
+    "exits": [
+      {
+        "direction": "north",
+        "targetIndex": 1
+      },
+      {
+        "direction": "east",
+        "targetIndex": null
+      }
+    ],
+    "items": [
+      "common mushroom"
+    ],
+    "visited": true
   },
   {
-    description: 'A whispering forest path.',
-    exits: [ [Object], [Object] ],
-    items: [],
-    visited: true
+    "description": "A whispering forest path.",
+    "exits": [
+      {
+        "direction": "west",
+        "targetIndex": null
+      },
+      {
+        "direction": "east",
+        "targetIndex": null
+      }
+    ],
+    "items": [],
+    "visited": true
   }
 ]
-✨  Done in 9.01s.
+
+Viewing initial location...
+Viewed location. Transaction: 3epKxzi93MP86hGJeLx8PV3yzEMK9xxPg2uwVJmdPLPp7atbrEMouiK9TEC9p5vmJPrYrEW7YdmGMFakU6ogzx7P
+Current Player Location Index: 1
+Game Map: [
+  {
+    "description": "You find yourself in a peaceful meadow.",
+    "exits": [
+      {
+        "direction": "north",
+        "targetIndex": 1
+      },
+      {
+        "direction": "east",
+        "targetIndex": null
+      }
+    ],
+    "items": [
+      "common mushroom"
+    ],
+    "visited": true
+  },
+  {
+    "description": "A whispering forest path.",
+    "exits": [
+      {
+        "direction": "west",
+        "targetIndex": null
+      },
+      {
+        "direction": "east",
+        "targetIndex": null
+      }
+    ],
+    "items": [],
+    "visited": true
+  }
+]
+
+Enter direction to move (north, south, east, west) or "stop" to exit: west
+
+Attempting to move west...
+Moved west. Transaction: 4rMwBuxGH9HYNHRxDdj3QPLLNQGvPHP42T3KZDGQwGRGH9KHbbUWhUi8SrDQUqj6LZkrNJPrnSkbbDNUdwqhrmYe
+New Player Location Index: 2
+Viewed new location. Transaction: 26YLmankfcaVibAANKnET9VDSAenVGXs5i6R55MHPBV7gZBRnLMVUMiNRr7RgvTt8sbdYLyswadZ1eUzbRfk23mv
+Updated Game Map: [
+  {
+    "description": "You find yourself in a peaceful meadow.",
+    "exits": [
+      {
+        "direction": "north",
+        "targetIndex": 1
+      },
+      {
+        "direction": "east",
+        "targetIndex": null
+      }
+    ],
+    "items": [
+      "common mushroom"
+    ],
+    "visited": true
+  },
+  {
+    "description": "A whispering forest path.",
+    "exits": [
+      {
+        "direction": "west",
+        "targetIndex": 2
+      },
+      {
+        "direction": "east",
+        "targetIndex": null
+      }
+    ],
+    "items": [],
+    "visited": true
+  },
+  {
+    "description": "A whispering forest path.",
+    "exits": [
+      {
+        "direction": "south",
+        "targetIndex": null
+      },
+      {
+        "direction": "north",
+        "targetIndex": null
+      }
+    ],
+    "items": [],
+    "visited": true
+  }
+]
+
+Enter direction to move (north, south, east, west) or "stop" to exit: south
+
+Attempting to move south...
+Moved south. Transaction: 2RxSZJoahYUci6NafxtwaVnbJ3vX4QRv3Jy1qKFAwVrb6Kv7F6XTgX6zGDTa8EXQ6rUzSAAqETJtknWMau9ue83D
+New Player Location Index: 3
+Viewed new location. Transaction: 2AzpS2Qa9vezCRZjXy2zpV4fwR7cgzNYh4cD56y3i2FFTBnYUn9bJXNtdXYpamUi3WJ4ZTvBV16WVpf4RmXWNiwm
+Updated Game Map: [
+  {
+    "description": "You find yourself in a peaceful meadow.",
+    "exits": [
+      {
+        "direction": "north",
+        "targetIndex": 1
+      },
+      {
+        "direction": "east",
+        "targetIndex": null
+      }
+    ],
+    "items": [
+      "common mushroom"
+    ],
+    "visited": true
+  },
+  {
+    "description": "A whispering forest path.",
+    "exits": [
+      {
+        "direction": "west",
+        "targetIndex": 2
+      },
+      {
+        "direction": "east",
+        "targetIndex": null
+      }
+    ],
+    "items": [],
+    "visited": true
+  },
+  {
+    "description": "A whispering forest path.",
+    "exits": [
+      {
+        "direction": "south",
+        "targetIndex": 3
+      },
+      {
+        "direction": "north",
+        "targetIndex": null
+      }
+    ],
+    "items": [],
+    "visited": true
+  },
+  {
+    "description": "A quiet clearing.",
+    "exits": [],
+    "items": [],
+    "visited": true
+  }
+]
+
+Enter direction to move (north, south, east, west) or "stop" to exit: stop
+Exiting movement loop...
+✨  Done in 64.05s.
 ```
 
 ## Features

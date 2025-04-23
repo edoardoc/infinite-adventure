@@ -2,7 +2,7 @@ import * as anchor from '@coral-xyz/anchor';
 import { Program } from '@coral-xyz/anchor';
 import { InfiniteAdventure } from '../target/types/infinite_adventure';
 import { Keypair, PublicKey } from '@solana/web3.js';
-import { getAssociatedTokenAddressSync } from '@solana/spl-token';
+import * as readline from 'readline';
 
 // Configure the client to use the devnet cluster.
 const cluster = 'devnet';
@@ -42,9 +42,14 @@ async function main() {
     programId
   );
 
-  // --- Initialize the game ---
-  console.log('Initializing game...');
   try {
+    const gameData = await program.account.gameDataAccount.fetch(gameDataAccount);
+    const gameMap = await program.account.gameMapAccount.fetch(gameMapAccount);
+    console.log('Accounts already initialized.');
+    console.log('Current Player Location Index:', gameData.playerLocationIndex);
+    console.log('Game Map:', JSON.stringify(gameMap.locations, null, 2));
+  } catch (error) {
+    console.log('Initializing game...');
     const tx = await program.methods
       .initialize()
       .accounts({
@@ -56,9 +61,6 @@ async function main() {
       .signers([payer])
       .rpc();
     console.log('Initialized game. Transaction:', tx);
-  } catch (error) {
-    console.error('Error initializing game:', error);
-    return;
   }
 
   // --- View the initial location ---
@@ -78,45 +80,69 @@ async function main() {
     const gameData = await program.account.gameDataAccount.fetch(gameDataAccount);
     const gameMap = await program.account.gameMapAccount.fetch(gameMapAccount);
     console.log('Current Player Location Index:', gameData.playerLocationIndex);
-    console.log('Game Map Locations:', gameMap.locations);
+    console.log('Game Map:', JSON.stringify(gameMap.locations, null, 2));
   } catch (error) {
     console.error('Error viewing location:', error);
   }
 
-  // --- Example: Move North ---
-  const moveDirection = 'north';
-  console.log(`\nAttempting to move ${moveDirection}...`);
-  try {
-    const tx = await program.methods
-      .movePlayer(moveDirection)
-      .accounts({
-        gameDataAccount: gameDataAccount as PublicKey,
-        gameMapAccount: gameMapAccount as PublicKey,
-        authority: payer.publicKey,
-      } as any)
-      .signers([payer])
-      .rpc();
-    console.log(`Moved ${moveDirection}. Transaction:`, tx);
 
-    const gameData = await program.account.gameDataAccount.fetch(gameDataAccount);
-    console.log('New Player Location Index:', gameData.playerLocationIndex);
 
-    // View the new location
-    const txView = await program.methods
-      .viewLocation()
-      .accounts({
-        gameDataAccount: gameDataAccount as PublicKey,
-        gameMapAccount: gameMapAccount as PublicKey,
-        authority: payer.publicKey,
-      } as any)
-      .signers([payer])
-      .rpc();
-    console.log('Viewed new location. Transaction:', txView);
-    const newGameMap = await program.account.gameMapAccount.fetch(gameMapAccount);
-    console.log('Updated Game Map Locations:', newGameMap.locations);
-  } catch (error) {
-    console.error(`Error moving ${moveDirection}:`, error);
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  async function movePlayerLoop() {
+    while (true) {
+      const moveDirection = await new Promise<string>((resolve) => {
+        rl.question('\nEnter direction to move (north, south, east, west) or "stop" to exit: ', resolve);
+      });
+
+      if (moveDirection.toLowerCase() === 'stop') {
+        console.log('Exiting movement loop...');
+        break;
+      }
+
+      console.log(`\nAttempting to move ${moveDirection}...`);
+      try {
+        const tx = await program.methods
+          .movePlayer(moveDirection)
+          .accounts({
+            gameDataAccount: gameDataAccount as PublicKey,
+            gameMapAccount: gameMapAccount as PublicKey,
+            authority: payer.publicKey,
+          } as any)
+          .signers([payer])
+          .rpc();
+        console.log(`Moved ${moveDirection}. Transaction:`, tx);
+
+        const gameData = await program.account.gameDataAccount.fetch(gameDataAccount);
+        console.log('New Player Location Index:', gameData.playerLocationIndex);
+
+        // View the new location
+        const txView = await program.methods
+          .viewLocation()
+          .accounts({
+            gameDataAccount: gameDataAccount as PublicKey,
+            gameMapAccount: gameMapAccount as PublicKey,
+            authority: payer.publicKey,
+          } as any)
+          .signers([payer])
+          .rpc();
+        console.log('Viewed new location. Transaction:', txView);
+        const newGameMap = await program.account.gameMapAccount.fetch(gameMapAccount);
+        console.log('Updated Game Map:', JSON.stringify(newGameMap.locations, null, 2));
+      } catch (error) {
+        console.error(`Error moving ${moveDirection}:`, error);
+      }
+    }
+
+    rl.close();
   }
+
+  await movePlayerLoop();
+
 }
 
 main().catch((err) => {

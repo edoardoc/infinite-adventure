@@ -54,6 +54,15 @@ pub struct ViewLocation<'info> {
     pub game_map_account: Account<'info, GameMapAccount>,
     pub authority: Signer<'info>, // Player's wallet
 }
+// Instruction to reset and clear the game map and player state
+#[derive(Accounts)]
+pub struct ResetGame<'info> {
+    #[account(mut, seeds = [GAME_LEVEL_SEED], bump)]
+    pub game_data_account: Account<'info, GameDataAccount>,
+    #[account(mut, seeds = [GAME_MAP_ACCOUNT_SEED], bump)]
+    pub game_map_account: Account<'info, GameMapAccount>,
+    pub authority: Signer<'info>, // Player's wallet
+}
 
 pub fn print_player_status(game_data_account: &Account<GameDataAccount>, game_map_account: &Account<GameMapAccount>) -> Result<()> {
   let current_location_index = game_data_account.player_location_index;

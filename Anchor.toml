@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-infinite_adventure = "7gMbksSMJbpH45gVH3QDxTUa2w4oSv6rfdjifPM8LUwX"
+infinite_adventure = "ALF2mCoNcyjspCXoc6cdjAV2JcM63kguTqEMPo4YULg1"
 
 [registry]
 url = "https://api.apr.dev"

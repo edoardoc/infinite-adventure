@@ -12,7 +12,7 @@ pub mod error;
 pub mod instructions;
 pub mod state;
 
-declare_id!("7gMbksSMJbpH45gVH3QDxTUa2w4oSv6rfdjifPM8LUwX");
+declare_id!("ALF2mCoNcyjspCXoc6cdjAV2JcM63kguTqEMPo4YULg1");
 
 #[program]
 pub mod infinite_adventure {
@@ -118,6 +118,28 @@ pub mod infinite_adventure {
         print_player_status(&ctx.accounts.game_data_account, &ctx.accounts.game_map_account)?;
         Ok(())
     }
+    /// Reset the game map and player state to initial values
+    pub fn reset_game(ctx: Context<ResetGame>) -> Result<()> {
+        let game_data_account = &mut ctx.accounts.game_data_account;
+        let game_map_account = &mut ctx.accounts.game_map_account;
+        // Reset player state
+        game_data_account.player_location_index = START_LOCATION_INDEX;
+        game_data_account.player_inventory = Vec::new();
+        // Clear and reinitialize game map
+        game_map_account.locations = Vec::new();
+        game_map_account.locations.push(Location {
+            description: "You find yourself in a peaceful meadow.".to_string(),
+            exits: vec![
+                Exit { direction: "north".to_string(), target_index: None },
+                Exit { direction: "east".to_string(), target_index: None },
+            ],
+            items: vec!["common mushroom".to_string()],
+            visited: true,
+        });
+        msg!("Game has been reset and map cleared.");
+        print_player_status(&ctx.accounts.game_data_account, &ctx.accounts.game_map_account)?;
+        Ok(())
+    }
 }
 
 fn generate_new_location(
@@ -134,6 +156,7 @@ fn generate_new_location(
         _ => "",
     };
 
+    // Initialize exits with a return path to the previous location
     let mut exits = Vec::new();
     exits.push(Exit {
         direction: opposite_direction.to_string(),
@@ -158,7 +181,6 @@ fn generate_new_location(
         temp
     };
 
-    let mut exits = Vec::new();
     for i in 0..num_new_exits {
         exits.push(Exit {
             direction: shuffled_directions[i].to_string(),

@@ -93,12 +93,34 @@ async function main() {
   async function movePlayerLoop() {
     while (true) {
       const moveDirection = await new Promise<string>((resolve) => {
-        rl.question('\nEnter direction to move (north, south, east, west) or collect or "stop" to exit: ', resolve);
+        rl.question('\nEnter direction to move (north, south, east, west) or collect or reset or "stop" to exit: ', resolve);
       });
 
       if (moveDirection.toLowerCase() === 'stop') {
         console.log('Exiting movement loop...');
         break;
+      }
+      if (moveDirection.toLowerCase() === 'reset') {
+        console.log('\nResetting game and clearing map...');
+        try {
+          const tx = await program.methods
+            .resetGame()
+            .accounts({
+              gameDataAccount: gameDataAccount as PublicKey,
+              gameMapAccount: gameMapAccount as PublicKey,
+              authority: payer.publicKey,
+            } as any)
+            .signers([payer])
+            .rpc();
+          console.log('Game reset. Transaction:', tx);
+          const gameData = await program.account.gameDataAccount.fetch(gameDataAccount);
+          const gameMap = await program.account.gameMapAccount.fetch(gameMapAccount);
+          console.log('Current Player Location Index:', gameData.playerLocationIndex);
+          console.log('Game Map:', JSON.stringify(gameMap.locations, null, 2));
+        } catch (error) {
+          console.error('Error resetting game:', error);
+        }
+        continue;
       }
 
       if (moveDirection.toLowerCase() === 'collect') {
